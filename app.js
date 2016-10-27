@@ -24,6 +24,14 @@ passport.deserializeUser(function(id, done) {
 	done("error in deserialize", user);
 });
 
+passport.use('login', new LocalStrategy({
+	function(username, password, done) {
+		if(username != "admin") {
+
+		}
+	}
+}));
+
 app.set('port', config.get("app").port);
 
 app.get('/', function(req, res) {
