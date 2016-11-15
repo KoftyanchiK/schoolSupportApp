@@ -12,7 +12,7 @@ var password = config.get("db").db_passwd;
 
 //Logging function
 var db_log = function(msg) {
-	console.log("Sequelize message for logging! " + msg + "!");
+	console.log("Sequelize message for logging! You can change this in db_logic.js file! " + msg + "\n");
 }
 
 var sequelize = new SQLZ(db, user, password, {
@@ -44,6 +44,21 @@ var users = sequelize.define('users', {
 	birthday: SQLZ.CHAR,
 	admin: SQLZ.BOOLEAN,
 	pswd: SQLZ.CHAR
+	//timestamps: false
+});
+
+var requests = sequelize.define('requests', {
+	request_id: {
+		type: SQLZ.INTEGER.UNSIGNED,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	fio: SQLZ.CHAR,
+	department: SQLZ.INTEGER,
+	room: SQLZ.INTEGER,
+	description: SQLZ.TEXT
+	// createdAt: SQLZ.DATE,
+	// updatedAt: SQLZ.DATE
 });
 
 users.sync().then(function() {
@@ -51,3 +66,26 @@ users.sync().then(function() {
 }).catch(function(err) {
 	console.log("Users sync error: " + err);
 });
+
+requests.sync().then(function() {
+	console.log("Requests sync is ok!");
+}).catch(function(err) {
+	console.log("Requests sync error: " + err);
+});
+
+function addRequest (id, fio, department, room, description) {
+	console.log("Adding request in DB...");
+	requests.create({
+		request_id: id,
+		fio: fio,
+		department: department,
+		room: room,
+		description: description
+	}).then(function() {
+		console.log("Request add successful!");
+	}).catch(function(err) {
+		console.log("Request was not added: " + err);
+	});
+}
+
+addRequest("", "Тестов Тест Тестович", "7", "322", "Все не работает");
