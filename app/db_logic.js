@@ -10,9 +10,11 @@ var db = config.get("db").name;
 var user = config.get("db").db_user;
 var password = config.get("db").db_passwd;
 
-//Logging function
+/*
+Change log message here
+*/
 var db_log = function(msg) {
-	console.log("Sequelize message for logging! You can change this in db_logic.js file! " + msg + "\n");
+	console.log("Sequelize message for logging! You can change this in db_logic.js file!\n" + msg + "\n");
 }
 
 var sequelize = new SQLZ(db, user, password, {
@@ -57,35 +59,49 @@ var requests = sequelize.define('requests', {
 	department: SQLZ.INTEGER,
 	room: SQLZ.INTEGER,
 	description: SQLZ.TEXT
-	// createdAt: SQLZ.DATE,
-	// updatedAt: SQLZ.DATE
 });
 
 users.sync().then(function() {
-	console.log('Users sync is OK!');
+	console.log('Users sync is OK!\n');
 }).catch(function(err) {
-	console.log("Users sync error: " + err);
+	console.log("Users sync error: \n" + err);
 });
 
 requests.sync().then(function() {
-	console.log("Requests sync is ok!");
+	console.log("Requests sync is ok!\n");
 }).catch(function(err) {
-	console.log("Requests sync error: " + err);
+	console.log("Requests sync error: \n" + err);
 });
 
-function addRequest (id, fio, department, room, description) {
-	console.log("Adding request in DB...");
+function addRequest(fio, department, room, description) {
+	console.log("Adding request in DB...\n");
 	requests.create({
-		request_id: id,
 		fio: fio,
 		department: department,
 		room: room,
 		description: description
 	}).then(function() {
-		console.log("Request add successful!");
+		console.log("Request add successful!\n");
 	}).catch(function(err) {
-		console.log("Request was not added: " + err);
+		console.log("Request was not added: \n" + err);
 	});
 }
 
-addRequest("", "Тестов Тест Тестович", "7", "322", "Все не работает");
+function getRequests(callback) {
+	console.log("Getting all requests...\n");
+	requests.findAll({
+		//empty obj for all items
+	}).then(function(requests) {
+		var reqs = [];
+		console.log("All right!");
+		requests.forEach(function(item, i, arr) {
+			reqs.push(item.dataValues);
+		});
+		callback(reqs);
+	}).catch(function(err) {
+		console.log("can't get requests: " + err);
+	});
+}
+
+var t = getRequests(console.log);
+//console.log("t is: ", t);
