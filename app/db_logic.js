@@ -3,7 +3,7 @@ var SQLZ = require("sequelize");
 
 config.argv()
 	.env()
-	.file({file: '../config.json'});
+	.file({file: './config.json'});
 
 var host = config.get("db").host;
 var db = config.get("db").name;

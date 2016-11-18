@@ -1,13 +1,32 @@
 var config = require("nconf");
 var express = require("express");
-//var expressSession = require('express-session');
+var hbs = require('hbs');
+
 var passport = require("passport"); 
 var LocalStrategy = require('passport-local');
+
 var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
-var app = express();
-var bodyParser = require('body-parser');
 
+var bodyParser = require('body-parser');
+var db = require("./app/db_logic.js");
+var app = express();
+
+app.set('view engine', 'hbs');//устанавливаем handlebars как шаблонизатор
+app.set('views', __dirname + '/views');
+
+//подключение путей со статикой
+app.use(express.static(__dirname + '/static/css'));
+app.use(express.static(__dirname + '/static/js'));
+//подключение partials для handlebars
+hbs.registerPartials(__dirname + '/views/partials');
+
+// Разбираем application/x-www-form-urlencoded
+app.use( bodyParser.urlencoded({extended: false}) );
+// Разбираем application/json
+app.use( bodyParser.json() );
+
+//Configuration file ON
 config.argv()
 	.env()
 	.file({file: 'config.json'});
@@ -17,6 +36,8 @@ app.use(cookieParser()); // req.cookies
 app.use(session({keys: [config.get("app").secret]})); // req.session
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.set('port', config.get("app").port);
 
 // Метод сохранения данных пользователя в сессии
 passport.serializeUser(function (user, done) {
@@ -37,10 +58,14 @@ passport.use(new LocalStrategy(function (username, pass, done) {
 	done(null, false);
 }));
 
-app.set('port', config.get("app").port);
-
 app.get('/', function(req, res) {
-	res.send('hello world');
+	var r = [];
+	db.getRequests(function(d) {
+		d.forEach(function(item, i, arr) {
+			r.push(item);
+		});
+		res.render("allReqs", {vals: r});
+	});
 });
 
 app.get('/secret', mustBeAuthentificated, function(req, res) {

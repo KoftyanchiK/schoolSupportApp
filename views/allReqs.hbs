@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Перечень заявок по неисправностям</title>
+		<link type="text/css" rel="stylesheet" href="bootstrap.min.css">
+	</head>
+	<body>
+		<div id='flexbox-container'>
+			<hr />
+			<div id='content'>
+				<table>
+					{{#each vals}}
+					<tr>
+						<td>{{this.request_id}}</td>
+						<td>{{this.fio}}</td>
+					</tr>
+					{{/each}}
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
