@@ -64,44 +64,115 @@ var requests = sequelize.define('requests', {
 users.sync().then(function() {
 	console.log('Users sync is OK!\n');
 }).catch(function(err) {
-	console.log("Users sync error: \n" + err);
+	console.log("Users sync error: \n");
+	throw new Error(err);
 });
 
 requests.sync().then(function() {
 	console.log("Requests sync is ok!\n");
 }).catch(function(err) {
-	console.log("Requests sync error: \n" + err);
+	console.log("Requests sync error: \n");
+	throw new Error(err);
 });
 
-function addRequest(fio, department, room, description) {
-	console.log("Adding request in DB...\n");
-	requests.create({
-		fio: fio,
-		department: department,
-		room: room,
-		description: description
-	}).then(function() {
-		console.log("Request add successful!\n");
-	}).catch(function(err) {
-		console.log("Request was not added: \n" + err);
-	});
-}
-
-function getRequests(callback) {
-	console.log("Getting all requests...\n");
-	requests.findAll({
-		//empty obj for all items
-	}).then(function(requests) {
-		var reqs = [];
-		console.log("All right!");
-		requests.forEach(function(item, i, arr) {
-			reqs.push(item.dataValues);
+var db = {
+	/*
+	Add new request in DB, returns request_id from DB and data about request over callback
+	*/
+	addRequest: function(fio, department, room, description, callback) {
+		console.log("Adding request in DB...\n");
+		requests.create({
+			fio: fio,
+			department: department,
+			room: room,
+			description: description
+		}).then(function(info) {
+			console.log("Request add successful!\n");
+			callback(info);
+		}).catch(function(err) {
+			console.log("Request was not added: \n");
+			throw new Error(err);
 		});
-		callback(reqs);
-	}).catch(function(err) {
-		console.log("can't get requests: " + err);
-	});
+	},
+
+	/*
+	Returns information about all requests over callback
+	*/
+	getRequests: function(callback) {
+		console.log("Getting all requests...\n");
+		requests.findAll({
+			//empty obj for all items
+		}).then(function(requests) {
+			var reqs = [];
+			console.log("Requests were fetched: \n");
+			requests.forEach(function(item, i, arr) {
+				reqs.push(item.dataValues);
+			});
+			callback(reqs);
+		}).catch(function(err) {
+			console.log("can't get requests: \n");
+			throw new Error(err);
+		});
+	},
+
+	/*
+	Reutrns info about one request with any ID
+	*/
+	getRequestById: function(id, callback) {
+		console.log("Getting request by ID...\n");
+		requests.findOne({
+			where: {
+				request_id: id
+			}
+		}).then(function(request) {
+			console.log("Request was fetched\n");
+			callback(request.dataValues);
+		}).catch(function(err) {
+			console.log("Can't get request by id: \n");
+			throw new Error(err);
+		});
+	},
+
+	/*
+	Return 1 if success and 0 otherwise
+	*/
+	updateRequestById: function(id, fio, department, room, description, callback) {
+		console.log("Updating request by id...\n");
+		requests.update({
+			fio: fio,
+			department: department,
+			room: room,
+			description: description
+		},{
+			where: {
+				request_id: id
+			}
+		}).then(function(info) {
+			console.log("Updating was successful!\n");
+			callback(info);
+		}).catch(function(err) {
+			console.log("Can't update request: \n");
+			throw new Error(err);
+		});
+	},
+
+	/*
+	Return 1 if success and 0 otherwise
+	*/
+	deleteRequest: function(id, callback) {
+		console.log("deleting request from DB...\n");
+		requests.destroy({
+			where: {
+				request_id: id
+			}
+		}).then(function(info) {
+			console.log("Request deleted successufy\n");
+			callback(info);
+		}).catch(function(err) {
+			console.log("Can't delete request: \n");
+			throw new Error(err);
+		});
+	}
 }
 
-var t = getRequests(console.log);
-//console.log("t is: ", t);
+module.exports = db;
