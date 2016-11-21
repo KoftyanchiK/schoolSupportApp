@@ -4,19 +4,51 @@
 		<meta charset="utf-8" />
 		<title>Перечень заявок по неисправностям</title>
 		<link type="text/css" rel="stylesheet" href="bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script src="jquery-3.1.1.min.js"></script>
+		<script src="bootstrap.min.js"></script>
 	</head>
 	<body>
 		<div id='flexbox-container'>
 			<hr />
 			<div id='content'>
-				<table>
+				<div id="wrap" class="wrap panel row">
+					<div class="row panel-heading alert-info noMargin">
+						<div class="cell col-xs-1"><h3>ID</h3></div>
+						<div class="cell col-xs-6"><h3>ФИО Обращавшегося</h3></div>
+						<div class="cell col-xs-2"><h3>Отделение</h3></div>
+						<div class="cell col-xs-2"><h3>Кабинет</h3></div>
+					</div>
 					{{#each vals}}
-					<tr>
-						<td>{{this.request_id}}</td>
-						<td>{{this.fio}}</td>
-					</tr>
+						{{#if this.done}}
+							<div class="panel panel-success">
+						{{else}}
+							<div class="panel panel-danger">
+						{{/if}}
+								<div class="row panel-heading noMargin" >
+									<div class="cell col-xs-1">{{this.request_id}}</div>
+									<div class="cell col-xs-6">{{this.fio}}</div>
+									<div class="cell col-xs-2">
+										{{#if this.department === 1}}
+											ШО1
+										{{else}}
+											JKHJKH
+										{{/if}}
+									</div>
+									<div class="cell col-xs-2">{{this.room}}</div>
+									<button  type="button" class="btn btn-danger col-xs-1" data-toggle="collapse" data-target="#req_{{this.request_id}}">
+										<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+									</button>
+									<div id="req_{{this.request_id}}" class="row collapse description panel-body col-xs-12">
+										<div class="cell col-xs-4">{{this.description}}</div>
+										<div class="cell col-xs-4">{{this.createdAt}}</div>
+										<div class="cell col-xs-4">{{this.updatedAt}}</div>
+									</div>
+								</div>
+							</div>
 					{{/each}}
-				</table>
+				</div>
 			</div>
 		</div>
 	</body>

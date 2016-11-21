@@ -15,9 +15,10 @@ var app = express();
 app.set('view engine', 'hbs');//устанавливаем handlebars как шаблонизатор
 app.set('views', __dirname + '/views');
 
-//подключение путей со статикой
+//подключение путей со статикой: стили, скрипты, шрифты
 app.use(express.static(__dirname + '/static/css'));
 app.use(express.static(__dirname + '/static/js'));
+app.use('/fonts/', express.static(__dirname + '/static/fonts'));
 //подключение partials для handlebars
 hbs.registerPartials(__dirname + '/views/partials');
 

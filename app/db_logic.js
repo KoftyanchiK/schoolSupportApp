@@ -58,7 +58,8 @@ var requests = sequelize.define('requests', {
 	fio: SQLZ.CHAR,
 	department: SQLZ.INTEGER,
 	room: SQLZ.INTEGER,
-	description: SQLZ.TEXT
+	description: SQLZ.TEXT,
+	done: SQLZ.BOOLEAN
 });
 
 users.sync().then(function() {
@@ -79,13 +80,14 @@ var db = {
 	/*
 	Add new request in DB, returns request_id from DB and data about request over callback
 	*/
-	addRequest: function(fio, department, room, description, callback) {
+	addRequest: function(fio, department, room, description, done, callback) {
 		console.log("Adding request in DB...\n");
 		requests.create({
 			fio: fio,
 			department: department,
 			room: room,
-			description: description
+			description: description,
+			done: done
 		}).then(function(info) {
 			console.log("Request add successful!\n");
 			callback(info);
@@ -104,7 +106,7 @@ var db = {
 			//empty obj for all items
 		}).then(function(requests) {
 			var reqs = [];
-			console.log("Requests were fetched: \n");
+			console.log("Requests were fetched.\n");
 			requests.forEach(function(item, i, arr) {
 				reqs.push(item.dataValues);
 			});
@@ -142,7 +144,8 @@ var db = {
 			fio: fio,
 			department: department,
 			room: room,
-			description: description
+			description: description,
+			done: done
 		},{
 			where: {
 				request_id: id
@@ -170,6 +173,40 @@ var db = {
 			callback(info);
 		}).catch(function(err) {
 			console.log("Can't delete request: \n");
+			throw new Error(err);
+		});
+	},
+
+	closeRequest: function(id, callback) {
+		console.log("Request with id " + id + " is DONE...");
+		requests.update({
+			done: 1
+		}, {
+			where: {
+				request_id: id
+			}
+		}).then(function(info) {
+			console.log("Request marked as DONE");
+			callback(info);
+		}).catch(function(err) {
+			console.log("Can't mark this task as DONE!");
+			throw new Error(err);
+		});
+	},
+
+	undoneRequest: function(id, callback) {
+		console.log("Request with id " + id + " is UNDONE...");
+		requests.update({
+			done: 0
+		}, {
+			where: {
+				request_id: id
+			}
+		}).then(function(info) {
+			console.log("Request marked as UNDONE");
+			callback(info);
+		}).catch(function(err) {
+			console.log("Can't mark this task as UNDONE!");
 			throw new Error(err);
 		});
 	}
