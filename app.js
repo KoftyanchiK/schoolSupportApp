@@ -21,6 +21,32 @@ app.use(express.static(__dirname + '/static/js'));
 app.use('/fonts/', express.static(__dirname + '/static/fonts'));
 //подключение partials для handlebars
 hbs.registerPartials(__dirname + '/views/partials');
+hbs.registerHelper('ifCond', function (v1, operator, v2, options) {
+    switch (operator) {
+        case '==':
+            return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '===':
+            return (v1 === v2) ? options.fn(this) : options.inverse(this);
+        case '!=':
+            return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '!==':
+            return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+            return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+            return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+            return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+            return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        case '&&':
+            return (v1 && v2) ? options.fn(this) : options.inverse(this);
+        case '||':
+            return (v1 || v2) ? options.fn(this) : options.inverse(this);
+        default:
+            return options.inverse(this);
+    }
+});
 
 // Разбираем application/x-www-form-urlencoded
 app.use( bodyParser.urlencoded({extended: false}) );
@@ -59,17 +85,15 @@ passport.use(new LocalStrategy(function (username, pass, done) {
 	done(null, false);
 }));
 
-app.get('/', function(req, res) {
-	var r = [];
+
+
+app.get('/allreqs', function(req, res) {
 	db.getRequests(function(d) {
-		d.forEach(function(item, i, arr) {
-			r.push(item);
-		});
-		res.render("allReqs", {vals: r});
+		res.render("allReqs", {vals: d});
 	});
 });
 
-app.get('/secret', mustBeAuthentificated, function(req, res) {
+app.get('/', mustBeAuthentificated, function(req, res) {
 	//passport.authenticate('local', {successRedirect: '/secret', failtureRedirect: '/login'});
 	res
 		.status(200)
@@ -90,7 +114,7 @@ app.get('/login', function(req, res) {
 
 // Обработчик запроса на авторизацию
 app.post('/login', bodyParser.urlencoded({ extended: false }), passport.authenticate('local', {
-  successRedirect: '/secret',
+  successRedirect: '/',
   failureRedirect: '/login'
 }));
 

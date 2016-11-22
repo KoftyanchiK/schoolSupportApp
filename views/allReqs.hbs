@@ -27,23 +27,44 @@
 							<div class="panel panel-danger">
 						{{/if}}
 								<div class="row panel-heading noMargin" >
-									<div class="cell col-xs-1">{{this.request_id}}</div>
-									<div class="cell col-xs-6">{{this.fio}}</div>
-									<div class="cell col-xs-2">
-										{{#if this.department === 1}}
+									<div class="cell col-xs-1"><h4>{{this.request_id}}</h4></div>
+									<div class="cell col-xs-6"><h4>{{this.fio}}</h4></div>
+									<div class="cell col-xs-2"><h4>
+										{{#ifCond this.department "==" 1}}
 											ШО1
 										{{else}}
-											JKHJKH
-										{{/if}}
+											{{#ifCond this.department "==" 2}}
+												ШО2
+											{{else}}
+												{{#ifCond this.department "==" 3}}
+													ШО3
+												{{else}}
+													{{#ifCond this.department "==" 4}}
+														ДО1
+													{{else}}
+														{{#ifCond this.department "==" 5}}
+															ДО2
+														{{else}}
+															{{#ifCond this.department "==" 6}}
+																ДО3
+															{{else}}
+																ДО4
+															{{/ifCond}}
+														{{/ifCond}}
+													{{/ifCond}}
+												{{/ifCond}}
+											{{/ifCond}}
+										{{/ifCond}}
+									</h4>
 									</div>
-									<div class="cell col-xs-2">{{this.room}}</div>
+									<div class="cell col-xs-2"><h4>{{this.room}}</h4></div>
 									<button  type="button" class="btn btn-danger col-xs-1" data-toggle="collapse" data-target="#req_{{this.request_id}}">
 										<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
 									</button>
 									<div id="req_{{this.request_id}}" class="row collapse description panel-body col-xs-12">
-										<div class="cell col-xs-4">{{this.description}}</div>
-										<div class="cell col-xs-4">{{this.createdAt}}</div>
-										<div class="cell col-xs-4">{{this.updatedAt}}</div>
+										<div class="cell col-xs-4"><h4>{{this.description}}</h4></div>
+										<div class="cell col-xs-4">Заявка создана: {{this.createdAt}}</div>
+										<div class="cell col-xs-4">Заявка обновлена: {{this.updatedAt}}</div>
 									</div>
 								</div>
 							</div>

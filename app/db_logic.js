@@ -108,7 +108,10 @@ var db = {
 			var reqs = [];
 			console.log("Requests were fetched.\n");
 			requests.forEach(function(item, i, arr) {
-				reqs.push(item.dataValues);
+				var t = item.dataValues;
+				t.createdAt = new Date(t.createdAt).toDateString();
+				t.updatedAt = new Date(t.createdAt).toDateString();
+				reqs.push(t);
 			});
 			callback(reqs);
 		}).catch(function(err) {
@@ -128,6 +131,8 @@ var db = {
 			}
 		}).then(function(request) {
 			console.log("Request was fetched\n");
+			request.dataValues.createdAt = new Date(request.dataValues.createdAt).toDateString();
+			request.dataValues.updatedAt = new Date(request.dataValues.updatedAt).toDateString();
 			callback(request.dataValues);
 		}).catch(function(err) {
 			console.log("Can't get request by id: \n");
