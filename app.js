@@ -1,6 +1,5 @@
 var config = require("nconf");
 var express = require("express");
-var hbs = require('hbs');
 
 var passport = require("passport"); 
 var LocalStrategy = require('passport-local');
@@ -10,6 +9,7 @@ var session = require('cookie-session');
 
 var bodyParser = require('body-parser');
 var db = require("./app/db_logic.js");
+var handlebars = require("./app/handlebars.js");
 var app = express();
 
 app.set('view engine', 'hbs');//устанавливаем handlebars как шаблонизатор
@@ -19,34 +19,6 @@ app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/static/css'));
 app.use(express.static(__dirname + '/static/js'));
 app.use('/fonts/', express.static(__dirname + '/static/fonts'));
-//подключение partials для handlebars
-hbs.registerPartials(__dirname + '/views/partials');
-hbs.registerHelper('ifCond', function (v1, operator, v2, options) {
-    switch (operator) {
-        case '==':
-            return (v1 == v2) ? options.fn(this) : options.inverse(this);
-        case '===':
-            return (v1 === v2) ? options.fn(this) : options.inverse(this);
-        case '!=':
-            return (v1 != v2) ? options.fn(this) : options.inverse(this);
-        case '!==':
-            return (v1 !== v2) ? options.fn(this) : options.inverse(this);
-        case '<':
-            return (v1 < v2) ? options.fn(this) : options.inverse(this);
-        case '<=':
-            return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-        case '>':
-            return (v1 > v2) ? options.fn(this) : options.inverse(this);
-        case '>=':
-            return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-        case '&&':
-            return (v1 && v2) ? options.fn(this) : options.inverse(this);
-        case '||':
-            return (v1 || v2) ? options.fn(this) : options.inverse(this);
-        default:
-            return options.inverse(this);
-    }
-});
 
 // Разбираем application/x-www-form-urlencoded
 app.use( bodyParser.urlencoded({extended: false}) );
