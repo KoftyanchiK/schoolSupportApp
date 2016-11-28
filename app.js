@@ -3,6 +3,7 @@ var express = require("express");
 
 var passport = require("passport"); 
 var LocalStrategy = require('passport-local');
+var logout = require('express-passport-logout');
 
 var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
@@ -51,25 +52,28 @@ passport.deserializeUser(function (username, done) {
 // Настройка стратегии авторизации
 passport.use(new LocalStrategy(function (username, pass, done) {
 	// Проверяем авторизационные данные
-	if (username === 'admin' && pass === 'admin')
+	if ((username === 'admin' && pass === 'admin') || (username === 'user' && pass === 'user'))
 		return done(null, {username: username});
-
 	done(null, false);
 }));
 
 
 
-app.get('/allreqs', function(req, res) {
-	db.getRequests(function(d) {
-		res.render("allReqs", {vals: d});
-	});
+app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
+	if (req.user && req.user.username === 'admin') {
+		db.getRequests(function(d) {
+			res.render("allReqs", {vals: d});
+		});
+	} else {
+		res
+			.status(401)
+			.send('Unauthorized');
+	}
 });
 
 app.get('/', mustBeAuthentificated, function(req, res) {
-	//passport.authenticate('local', {successRedirect: '/secret', failtureRedirect: '/login'});
-	res
-		.status(200)
-		.send("secret part");
+	//console.log(req);
+	res.send("<a href='/logout'>Exit</a>");
 });
 
 app.get('/login', function(req, res) {
@@ -86,15 +90,26 @@ app.get('/login', function(req, res) {
 
 // Обработчик запроса на авторизацию
 app.post('/login', bodyParser.urlencoded({ extended: false }), passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login'
-}));
+  	//successRedirect: '/',
+  	failureRedirect: '/login'
+}),
+	function(req, res) {
+		if(req.user.username == 'admin') {
+			res.redirect('/allreqs');
+		} else {
+			res.redirect('/');
+		}
+		// console.log(req);
+		// res.redirect('/');
+	}
+);
+
+app.get('/logout', logout('/'));
 
 // Метод для проверки пользователя
 function mustBeAuthentificated (req, res, next) {
 	if (req.isAuthenticated())
 		return next();
-
 	res.redirect('/login'); // переход на страницу логина
 }
 
