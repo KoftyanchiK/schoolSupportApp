@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Оформление заявки</title>
+	<meta charset="utf-8" />
+	<link type="text/css" rel="stylesheet" href="bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<script src="jquery-3.1.1.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+</head>
+<body>
+	{{> header}}
+	<div id="flexbox-container" class="container row">
+		<form action="/createreq" method="post">
+			<div class="col-sm-3" ></div>
+			<div class="form-group col-sm-6">
+				<h2 id="create-form-heading" class="form-heading">Заполните поля для&nbsp;оформления заявки</h2>
+				<label for="fio">Введите фамилию, имя и отчество</label>
+				<input class="form-control" type="text" placeholder="Фамилия Имя Отчество" id="fio" name="fio" />
+				<label for="department">Выберите отделение</label>
+				<select class="form-control" id="department" name="department">
+					<option value="1">ШО1</option>
+					<option value="2">ШО2</option>
+					<option value="3">ШО3</option>
+					<option value="4">ДО1</option>
+					<option value="5">ДО2</option>
+					<option value="6">ДО3</option>
+					<option value="7">ДО4</option>
+				</select>
+				<label for="room">Введите номер или название кабинета</label>
+				<input type="text" class="form-control" placeholder="Номер или название кабинета" id="room" name="room" size="30" maxlength="25">
+				<label for="description">Опишите проблему (макс. 255 символов)</label>
+				<textarea class="form-control" placeholder="Опишите проблему (макс. 255 символов)" id="description" name="description" rows="5"></textarea>
+				<input type="submit" value="Оставить заявку" class="form-control btn btn-primary">
+			</div>
+			<div class="col-sm-3" ></div>
+		</form>
+	</div>
+</body>
+</html>

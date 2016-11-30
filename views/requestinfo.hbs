@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Заявка создана</title>
+	<link type="text/css" rel="stylesheet" href="bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<script src="jquery-3.1.1.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+</head>
+<body>
+	{{> header}}
+	<h1>Ваша заявка создана и передана в обработку:</h1>
+	<div class="alert alert-success" role="alert">
+  		<strong><h1>Номер&nbsp;заявки:&nbsp;{{vals.request_id}}</h1> Запишите номер Вашей заявки, назовите его при обращении по телефону, если Ваша заявка не будет обработана в течении <b>недели</b>.</strong>
+  	</div>
+  	<label for='fio'>Фамилия Имя Отчество</label>
+  	<div class="alert alert-success" id='fio'>
+  		{{vals.fio}}
+  	</div>
+  	<label for='department'>Отделение</label>
+  	<div class="alert alert-success" id='department'>
+  		{{#ifCond vals.department "==" 1}}
+			ШО1
+		{{else}}
+			{{#ifCond vals.department "==" 2}}
+				ШО2
+			{{else}}
+				{{#ifCond vals.department "==" 3}}
+					ШО3
+				{{else}}
+					{{#ifCond vals.department "==" 4}}
+						ДО1
+					{{else}}
+						{{#ifCond vals.department "==" 5}}
+							ДО2
+						{{else}}
+							{{#ifCond vals.department "==" 6}}
+								ДО3
+							{{else}}
+								ДО4
+							{{/ifCond}}
+						{{/ifCond}}
+					{{/ifCond}}
+				{{/ifCond}}
+			{{/ifCond}}
+		{{/ifCond}}
+  	</div>
+  	<label for='room'>Кабинет</label>
+  	<div class="alert alert-success" id='room'>
+  		{{vals.room}}
+  	</div>
+  	<label for='description'>Описание проблемы</label>
+  	<div class="alert alert-success" id='description'>
+  		{{vals.description}}
+  	</div>
+</div>
+</body>
+</html>

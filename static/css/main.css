@@ -4,6 +4,29 @@
 	margin-right: auto;
 }
 
+#create-form-heading {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#flexbox-container-login {
+	max-width: 750px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#form-header {
+	max-width: 350px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#form-body {
+	max-width: 150px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .noMargin {
 	margin-left: 0;
 	margin-right: 0;

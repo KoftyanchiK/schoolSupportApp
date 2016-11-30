@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <title>Login</title>
+	    <link type="text/css" rel="stylesheet" href="bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script src="jquery-3.1.1.min.js"></script>
+		<script src="bootstrap.min.js"></script>
+	</head>
+
+	<body>
+
+		<div id="flexbox-container-login">
+			<form class="form-signin" action="/login" method="post">
+				<div id="form-header">
+					<h2 class="form-signin-heading">Войдите в систему</h2>
+				</div>
+				<div id='form-body'>
+					<label for="inputEmail" class="sr-only">Ваш логин</label>
+					<input id="inputEmail" name="username" class="form-control" placeholder="Ваш логин" required="" autofocus="" type="text">
+					<label for="inputPassword" class="sr-only">Password</label>
+					<input id="inputPassword" name="password" class="form-control" placeholder="Пароль" required="" type="password">
+					<button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+				</div>
+			</form>
+		</div> <!-- /container -->
+	</body>
+</html>

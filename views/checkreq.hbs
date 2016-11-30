@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Перечень заявок по неисправностям</title>
+		<title>Статусы заявок</title>
 		<link type="text/css" rel="stylesheet" href="bootstrap.min.css">
 		<link type="text/css" rel="stylesheet" href="bootstrap-theme.min.css">
 		<link rel="stylesheet" type="text/css" href="main.css">
@@ -11,15 +11,31 @@
 	</head>
 	<body>
 		{{> header}}
+
 		<div id='flexbox-container'>
-			<hr />
+			<div class="panel-heading">
+				<h1>
+					Статус заявок от пользователей. Гимназия № 1799 "Экополис"
+				</h1>
+			</div>
+			<div class="description" style='margin-top: 5px'>
+				<div class="row">
+					<div class="alert alert-success col-xs-1" width="50px" height="50px"></div>
+					<span><h3 style="margin-top: 0px">Заявка выполнена</h3></span>
+				</div>
+				<div class="row">
+					<div class="alert alert-danger col-xs-1" width="50px" height="50px"></div>
+					<span><h3 style="margin-top: 0px">Заявка в обработке</h3></span>
+				</div>
+			</div>
+				
 			<div id='content'>
 				<div id="wrap" class="wrap panel row">
 					<div class="row panel-heading alert-info noMargin">
-						<div class="cell col-xs-1"><h3>ID</h3></div>
-						<div class="cell col-xs-6"><h3>ФИО Обращавшегося</h3></div>
+						<div class="cell col-xs-2"><h3>ID заявки</h3></div>
 						<div class="cell col-xs-2"><h3>Отделение</h3></div>
 						<div class="cell col-xs-2"><h3>Кабинет</h3></div>
+						<div class="cell col-xs-4"><h3>Дата создания заявки</h3></div>
 					</div>
 					{{#each vals}}
 						{{#if this.done}}
@@ -28,8 +44,7 @@
 							<div class="panel panel-danger">
 						{{/if}}
 								<div class="row panel-heading noMargin" >
-									<div class="cell col-xs-1"><h4>{{this.request_id}}</h4></div>
-									<div class="cell col-xs-6"><h4>{{this.fio}}</h4></div>
+									<div class="cell col-xs-2"><h4>{{this.request_id}}</h4></div>
 									<div class="cell col-xs-2"><h4>
 										{{#ifCond this.department "==" 1}}
 											ШО1
@@ -59,20 +74,8 @@
 									</h4>
 									</div>
 									<div class="cell col-xs-2"><h4>{{this.room}}</h4></div>
-									<button  type="button" class="btn btn-danger col-xs-1" data-toggle="collapse" data-target="#req_{{this.request_id}}">
-										<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-									</button>
-									<div id="req_{{this.request_id}}" class="row collapse description panel-body col-xs-12">
-										<div class="cell col-xs-3"><h4>{{this.description}}</h4></div>
-										<div class="cell col-xs-3">Заявка создана: {{this.createdAt}}</div>
-										<div class="cell col-xs-3">Заявка обновлена: {{this.updatedAt}}</div>
-										{{#if this.done}}
-											
-										{{else}}
-											<a href="/closereq/{{this.request_id}}"><button value="Done" class="btn btn-success">Done</button></a>
-										{{/if}}
+									<div class="cell col-xs-4">{{this.createdAt}}</div>
 									</div>
-								</div>
 							</div>
 					{{/each}}
 				</div>

@@ -57,7 +57,7 @@ var requests = sequelize.define('requests', {
 	},
 	fio: SQLZ.CHAR,
 	department: SQLZ.INTEGER,
-	room: SQLZ.INTEGER,
+	room: SQLZ.CHAR,
 	description: SQLZ.TEXT,
 	done: SQLZ.BOOLEAN
 });
@@ -80,7 +80,7 @@ var db = {
 	/*
 	Add new request in DB, returns request_id from DB and data about request over callback
 	*/
-	addRequest: function(fio, department, room, description, done, callback) {
+	addRequest: function(fio, department, room, description, callback, done='false') {
 		console.log("Adding request in DB...\n");
 		requests.create({
 			fio: fio,

@@ -3,7 +3,7 @@ var express = require("express");
 
 var passport = require("passport"); 
 var LocalStrategy = require('passport-local');
-var logout = require('express-passport-logout');
+//var logout = require('express-passport-logout');
 
 var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
@@ -57,7 +57,11 @@ passport.use(new LocalStrategy(function (username, pass, done) {
 	done(null, false);
 }));
 
-
+app.get('/', function(req, res) {
+	db.getRequests(function(d) {
+		res.render("checkreq", {vals: d});
+	});
+});
 
 app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
 	if (req.user && req.user.username === 'admin') {
@@ -71,21 +75,30 @@ app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
 	}
 });
 
-app.get('/', mustBeAuthentificated, function(req, res) {
-	//console.log(req);
-	res.send("<a href='/logout'>Exit</a>");
+app.get('/createreq', mustBeAuthentificated, function(req, res) {
+	res.render('create');
+});
+
+app.post('/createreq', mustBeAuthentificated, function(req, res) {
+	var request = {
+		fio: req.body.fio,
+		department: req.body.department,
+		room: req.body.room,
+		description: req.body.description
+	}
+	db.addRequest(request.fio, request.department, request.room, request.description, function(info) {
+		res.render("requestinfo", {vals: info.dataValues});
+	});
+});
+
+app.get('/closereq/:id', mustBeAuthentificated, function(req, res) {
+	db.closeRequest(req.params.id, function(info) {
+		res.send(info);
+	});
 });
 
 app.get('/login', function(req, res) {
-	res
-		.status(200)
-		.send(
-			'<form action="/login" method="post">' +
-		        'Login: ' +
-		        '<input type="text" name="username" />' +
-		        '<input type="password" name="password" />' +
-		        '<input type="submit" />' +
-      		'</form>');
+	res.render('login');
 });
 
 // Обработчик запроса на авторизацию
@@ -94,17 +107,20 @@ app.post('/login', bodyParser.urlencoded({ extended: false }), passport.authenti
   	failureRedirect: '/login'
 }),
 	function(req, res) {
+		//если админ, переадресовать в админку, если нет - в корень
 		if(req.user.username == 'admin') {
 			res.redirect('/allreqs');
 		} else {
 			res.redirect('/');
 		}
-		// console.log(req);
-		// res.redirect('/');
 	}
 );
 
-app.get('/logout', logout('/'));
+app.get('/logout', function(req, res) {
+    req.session = null;
+	req.logout();
+	res.redirect('/');
+});
 
 // Метод для проверки пользователя
 function mustBeAuthentificated (req, res, next) {
