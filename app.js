@@ -59,14 +59,14 @@ passport.use(new LocalStrategy(function (username, pass, done) {
 
 app.get('/', function(req, res) {
 	db.getRequests(function(d) {
-		res.render("checkreq", {vals: d});
+		res.render("checkreq", {vals: d, user: req.user ? req.user.username : ''});
 	});
 });
 
 app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
 	if (req.user && req.user.username === 'admin') {
 		db.getRequests(function(d) {
-			res.render("allReqs", {vals: d});
+			res.render("allReqs", {vals: d, user: req.user.username});
 		});
 	} else {
 		res
@@ -76,7 +76,7 @@ app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
 });
 
 app.get('/createreq', mustBeAuthentificated, function(req, res) {
-	res.render('create');
+	res.render('create', {user: req.user.username});
 });
 
 app.post('/createreq', mustBeAuthentificated, function(req, res) {
@@ -87,14 +87,44 @@ app.post('/createreq', mustBeAuthentificated, function(req, res) {
 		description: req.body.description
 	}
 	db.addRequest(request.fio, request.department, request.room, request.description, function(info) {
-		res.render("requestinfo", {vals: info.dataValues});
+		res.render("requestinfo", {vals: info.dataValues, user: req.user.username});
 	});
 });
 
 app.get('/closereq/:id', mustBeAuthentificated, function(req, res) {
-	db.closeRequest(req.params.id, function(info) {
-		res.send(info);
-	});
+	//если админ, то дать выполнить запрос на закрытие заявки
+	if (req.user && req.user.username === 'admin') {
+		db.closeRequest(req.params.id, function(info) {
+			//если вернулась единичка, значит заявка закрыта
+			if (info[0] == 1) {
+				res.redirect('/allreqs');
+			} else {
+				res.send("По какой-то причине не удалось закрыть заявку.");
+			}
+		});
+	} else {
+		res
+			.status(401)
+			.send('Unauthorized');
+	}
+});
+
+app.get('/deletereq/:id', mustBeAuthentificated, function(req, res) {
+	//если админ, то дать выполнить запрос на удаление заявки
+	if (req.user && req.user.username === 'admin') {
+		db.deleteRequest(req.params.id, function(info) {
+			//если вернулась единичка, значит заявка удалена
+			if (info == 1) {
+				res.redirect('/allreqs');
+			} else {
+				res.send("По какой-то причине не удалось удалить заявку.");
+			}
+		});
+	} else {
+		res
+			.status(401)
+			.send('Unauthorized');
+	}
 });
 
 app.get('/login', function(req, res) {
@@ -121,6 +151,11 @@ app.get('/logout', function(req, res) {
 	req.logout();
 	res.redirect('/');
 });
+
+app.use(function(req, res) {
+	console.log("someone trying access bad url");
+	res.send("Page not found!");
+})
 
 // Метод для проверки пользователя
 function mustBeAuthentificated (req, res, next) {

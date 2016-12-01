@@ -59,7 +59,8 @@ var requests = sequelize.define('requests', {
 	department: SQLZ.INTEGER,
 	room: SQLZ.CHAR,
 	description: SQLZ.TEXT,
-	done: SQLZ.BOOLEAN
+	done: SQLZ.BOOLEAN,
+	//paranoid: false
 });
 
 users.sync().then(function() {
@@ -168,13 +169,13 @@ var db = {
 	Return 1 if success and 0 otherwise
 	*/
 	deleteRequest: function(id, callback) {
-		console.log("deleting request from DB...\n");
+		console.log("deleting " + id + " request from DB...\n");
 		requests.destroy({
 			where: {
 				request_id: id
 			}
 		}).then(function(info) {
-			console.log("Request deleted successufy\n");
+			console.log("Request " + id + " deleted successfuly\n");
 			callback(info);
 		}).catch(function(err) {
 			console.log("Can't delete request: \n");
