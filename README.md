@@ -1,4 +1,4 @@
-This app is made for the receipt of applications for the repair of equipment the school IT department
+This application is made for school IT department and helps requesting and processing  maintenance tickets from the users.
 
 Used: Express.js, passport.js, sequelize.js + mysql, nconf
 
