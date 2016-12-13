@@ -9,7 +9,9 @@ var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
 
 var bodyParser = require('body-parser');
-var db = require("./app/db_logic.js");
+var db = require("./app/requests.js");
+var user = require("./app/users.js");
+var tg = require("./app/telegram_bot.js");
 var handlebars = require("./app/handlebars.js");
 var app = express();
 
@@ -34,9 +36,11 @@ config.argv()
 //app.use(expressSession({secret: config.get("app").secret}));
 app.use(cookieParser()); // req.cookies
 app.use(session({keys: [config.get("app").secret]})); // req.session
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+//берем порт для приложения из конфига
 app.set('port', config.get("app").port);
 
 // Метод сохранения данных пользователя в сессии
@@ -52,21 +56,31 @@ passport.deserializeUser(function (username, done) {
 // Настройка стратегии авторизации
 passport.use(new LocalStrategy(function (username, pass, done) {
 	// Проверяем авторизационные данные
-	if ((username === 'admin' && pass === 'admin') || (username === 'user' && pass === 'user'))
-		return done(null, {username: username});
-	done(null, false);
+	//Неплохо бы сделать отдельную проверку на правильность логина и отдельно пароль
+	user.findOne(username, function(usr) {
+		//если юзер пришел из БД и логин совпадает (лишняя проверка?) и хеш пароля совпадает с тем, что пришло из БД
+		//то пропускаем его дальше
+		if((usr) && (username === usr.login) && (user.encryptPassword(pass) === usr.pswd)) {
+			// console.log(user.encryptPassword(pass));
+			// console.log(user.encryptPassword(usr.pswd))
+			return done(null, {username: usr});
+		}
+		done(null, false);
+	});
 }));
 
+//Роуты для приложения
 app.get('/', function(req, res) {
+	tg.sendMsg("Access!!!");
 	db.getRequests(function(d) {
 		res.render("checkreq", {vals: d, user: req.user ? req.user.username : ''});
 	});
 });
 
 app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
-	if (req.user && req.user.username === 'admin') {
+	if (req.user && req.user.username.admin === true) {
 		db.getRequests(function(d) {
-			res.render("allReqs", {vals: d, user: req.user.username});
+			res.render("allReqs", {vals: d, user: req.user ? req.user.username : ''});
 		});
 	} else {
 		res
@@ -76,7 +90,7 @@ app.get('/allreqs', mustBeAuthentificated, function(req, res, next) {
 });
 
 app.get('/createreq', mustBeAuthentificated, function(req, res) {
-	res.render('create', {user: req.user.username});
+	res.render('create', {user: req.user ? req.user.username : ''});
 });
 
 app.post('/createreq', mustBeAuthentificated, function(req, res) {
@@ -84,16 +98,45 @@ app.post('/createreq', mustBeAuthentificated, function(req, res) {
 		fio: req.body.fio,
 		department: req.body.department,
 		room: req.body.room,
-		description: req.body.description
+		description: req.body.description.substring(0, 254)
 	}
+	var dep;
+	switch(request.department) {
+		case "1":
+			dep = "ШО1";
+			break;
+		case "2":
+			dep = "ШО2";
+			break;
+		case "3":
+			dep = "ШО3";
+			break;
+		case "4":
+			dep = "ДО1";
+			break;
+		case "5":
+			dep = "ДО2";
+			break;
+		case "6":
+			dep = "ДО3";
+			break;
+		case "7":
+			dep = "ДО4";
+			break;
+	}
+	var tgMsg = "У пользователя: *" + request.fio + "*\n"
+		+ "из " + request.room + " в " + dep +
+		" случилось следующее: \n*" + request.description + "*";
 	db.addRequest(request.fio, request.department, request.room, request.description, function(info) {
-		res.render("requestinfo", {vals: info.dataValues, user: req.user.username});
+
+		tg.sendMsg(tgMsg);
+		res.render("requestinfo", {vals: info.dataValues, user: req.user ? req.user.username : ''});
 	});
 });
 
 app.get('/closereq/:id', mustBeAuthentificated, function(req, res) {
 	//если админ, то дать выполнить запрос на закрытие заявки
-	if (req.user && req.user.username === 'admin') {
+	if (req.user && req.user.username.admin === true) {
 		db.closeRequest(req.params.id, function(info) {
 			//если вернулась единичка, значит заявка закрыта
 			if (info[0] == 1) {
@@ -111,7 +154,7 @@ app.get('/closereq/:id', mustBeAuthentificated, function(req, res) {
 
 app.get('/deletereq/:id', mustBeAuthentificated, function(req, res) {
 	//если админ, то дать выполнить запрос на удаление заявки
-	if (req.user && req.user.username === 'admin') {
+	if (req.user && req.user.username.admin === true) {
 		db.deleteRequest(req.params.id, function(info) {
 			//если вернулась единичка, значит заявка удалена
 			if (info == 1) {
@@ -138,7 +181,7 @@ app.post('/login', bodyParser.urlencoded({ extended: false }), passport.authenti
 }),
 	function(req, res) {
 		//если админ, переадресовать в админку, если нет - в корень
-		if(req.user.username == 'admin') {
+		if (req.user && req.user.username.admin === true) {
 			res.redirect('/allreqs');
 		} else {
 			res.redirect('/');
@@ -152,6 +195,7 @@ app.get('/logout', function(req, res) {
 	res.redirect('/');
 });
 
+//Если пытаются попасть на несуществующий урл
 app.use(function(req, res) {
 	console.log("someone trying access bad url");
 	res.send("Page not found!");
@@ -164,6 +208,7 @@ function mustBeAuthentificated (req, res, next) {
 	res.redirect('/login'); // переход на страницу логина
 }
 
+//Стартуем приложение
 app.listen(app.get('port'), function() {
 	console.log('app was started on ' + app.get('port') + ' port!');
 });

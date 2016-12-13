@@ -14,7 +14,6 @@
     "cookie-session": "^2.0.0-alpha.1",
     "express": "^4.14.0",
     "express-passport-logout": "^0.1.0",
-    "express-session": "^1.14.1",
     "hbs": "^4.0.1",
     "mysql": "^2.11.1",
     "nconf": "^0.8.4",

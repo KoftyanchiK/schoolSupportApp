@@ -1,15 +1,15 @@
 <div class="container">
 	<div id="header" class="row">
-		{{#ifCond user "==" 'admin'}}
+		{{#if user.admin}}
 			<a href="/allreqs" >
 		{{else}}
 			<a href="/" >
-		{{/ifCond}}
+		{{/if}}
 		<button class="btn btn-info col-xs-2">Проверить статус заявки</button></a>
 		<a href="/createreq" ><button class="btn btn-info col-xs-2">Создать заявку</button></a>
 		<div class="col-xs-6"></div>
 		<a href="/login" ><button class="btn btn-success col-xs-1">Войти</button></a>
 		<a href="/logout" ><button class="btn btn-danger col-xs-1">Выйти</button></a>
 	</div>
-	<div>{{#if user}}Здравствуй, {{user}}!{{/if}}</div>
+	<div>{{#if user}}Здравствуй, {{user.login}}!{{/if}}</div>
 </div>
