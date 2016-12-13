@@ -15,5 +15,11 @@ Used: Express.js, passport.js, sequelize.js + mysql, nconf
 		"app": {
 			"port": App_Port_Which_Express_will_listen,
 			"secret": Secret_Word_For_Cookie
+		},
+
+		"telegram_bot": {
+			"token": Telegram bot token,
+			"chatId": groupChat ID,
+			"apiUrl": "https://api.telegram.org/bot" - Telegram API URL
 		}
 	}
